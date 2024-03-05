@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { initialState } from './typeShop'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { Todo } from './typeShop'
+import { ColumnType } from '../../components/Column'
 export const shopSlice = createSlice({
   name: 'shop',
   initialState,
@@ -13,19 +14,15 @@ export const shopSlice = createSlice({
       const { listId, todo } = action.payload
       const listIndex = state.lists.findIndex(list => list.id === listId)
       if (listIndex !== -1) {
-        state.lists[listIndex].todos.push(todo)
+        state.lists[listIndex].cards.push(todo)
       }
     },
-    // addTodoToList: (
-    //   state,
-    //   action: PayloadAction<{ listId: string; todo: Todo }>,
-    // ) => {
-    //   const { listId, todo } = action.payload
-    //   const listIndex = state.lists.findIndex(list => list.id === listId)
-    //   if (listIndex !== -1) {
-    //     state.lists[listIndex].todos = [...state.lists[listIndex].todos, todo] // Updating todos immutably
-    //   }
-    // },
+    updateLists(state, action: PayloadAction<ColumnType[]>) {
+      return {
+        ...state,
+        lists: action.payload,
+      }
+    },
     editTodo(
       state,
       action: PayloadAction<{
@@ -84,5 +81,6 @@ export const {
   editImage,
   editTodo,
   deleteImage,
+  updateLists,
 } = shopSlice.actions
 export default shopSlice.reducer

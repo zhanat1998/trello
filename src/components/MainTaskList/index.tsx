@@ -1,89 +1,139 @@
-import { DndContext, DragEndEvent, DragOverEvent } from '@dnd-kit/core'
-import { arrayMove } from '@dnd-kit/sortable'
+import {
+  closestCorners,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragOverEvent,
+} from '@dnd-kit/core'
+import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import { useEffect, useState } from 'react'
-import { TaskList } from '../TaskList'
 import '../MainTaskList/MainTaskList.scss'
-import { useAppSelector } from '../../hook'
-
-type ITaskList = { [key: string]: string[] }
+import { useAppDispatch, useAppSelector } from '../../hook'
+import Column, { ColumnType } from '../Column'
+import { updateLists } from '../../store/shop/slice'
 
 export const MainTaskList = () => {
-  const Lists = useAppSelector(state => state.shopReducer.lists)
-  const [taskList, setTaskList] = useState<ITaskList>({})
-  console.log(Lists, 'listtssss')
+  const data = useAppSelector(state => state.shopReducer.lists)
+  const dispatch = useAppDispatch()
+
+  console.log(data, 'data')
+  const [columns, setColumns] = useState<ColumnType[]>(data)
   useEffect(() => {
-    console.log(Lists, 'lists')
-    if (Lists) {
-      const convertedTaskList: ITaskList = {}
-      Lists.forEach(list => {
-        convertedTaskList[list.id] = list.todos.map(todo => todo.title)
-      })
-      setTaskList(convertedTaskList)
+    setColumns(data)
+  }, [data])
+  console.log(columns, 'columns')
+  // useEffect(() => {
+  //   dispatch(updateLists(columns))
+  // }, [columns, dispatch])
+  const findColumn = (unique: string | null) => {
+    if (!unique) {
+      return null
     }
-  }, [Lists])
+    if (columns.some(c => c.id === unique)) {
+      return columns.find(c => c.id === unique) ?? null
+    }
+    const id = String(unique)
+    const itemWithColumnId = columns.flatMap(c => {
+      const columnId = c.id
+      return c.cards.map(i => ({ itemId: i.id, columnId: columnId }))
+    })
+    const columnId = itemWithColumnId.find(i => i.itemId === id)?.columnId
+    return columns.find(c => c.id === columnId) ?? null
+  }
 
-  const dragEndHandler = (e: DragEndEvent) => {
-    if (!e.over || !e.active.data.current || !e.over.data.current) return
-    if (e.active.id === e.over.id) return
-    if (
-      e.active.data.current.sortable.containerId !==
-      e.over.data.current.sortable.containerId
-    )
-      return
-    const containerName = e.active.data.current.sortable.containerId
-
-    setTaskList(taskList => {
-      const temp = { ...taskList }
-      if (!e.over) return temp
-      const oldIdx = temp[containerName].indexOf(e.active.id.toString())
-      const newIdx = temp[containerName].indexOf(e.over.id.toString())
-      temp[containerName] = arrayMove(temp[containerName], oldIdx, newIdx)
-      return temp
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over, delta } = event
+    const activeId = String(active.id)
+    const overId = over ? String(over.id) : null
+    const activeColumn = findColumn(activeId)
+    const overColumn = findColumn(overId)
+    if (!activeColumn || !overColumn || activeColumn === overColumn) {
+      return null
+    }
+    setColumns(prevState => {
+      const activeItems = activeColumn.cards
+      const overItems = overColumn.cards
+      const activeIndex = activeItems.findIndex(i => i.id === activeId)
+      const overIndex = overItems.findIndex(i => i.id === overId)
+      const newIndex = () => {
+        const putOnBelowLastItem =
+          overIndex === overItems.length - 1 && delta.y > 0
+        const modifier = putOnBelowLastItem ? 1 : 0
+        return overIndex >= 0 ? overIndex + modifier : overItems.length + 1
+      }
+      return prevState.map(c => {
+        if (c.id === activeColumn.id) {
+          c.cards = activeItems.filter(i => i.id !== activeId)
+          return c
+        } else if (c.id === overColumn.id) {
+          c.cards = [
+            ...overItems.slice(0, newIndex()),
+            activeItems[activeIndex],
+            ...overItems.slice(newIndex(), overItems.length),
+          ]
+          return c
+        } else {
+          return c
+        }
+      })
     })
   }
-  const dragOverHandler = (e: DragOverEvent) => {
-    if (!e.over) return
-    const initialContainer = e.active.data.current?.sortable?.containerId
-    const targetContainer = e.over.data.current?.sortable?.containerId
-    if (!initialContainer) return
-    setTaskList(taskList => {
-      const temp = { ...taskList }
-      if (!targetContainer) {
-        if (taskList[e.over!.id].includes(e.active.id.toString())) return temp
-        temp[initialContainer] = temp[initialContainer].filter(
-          task => task !== e.active.id.toString(),
-        )
-        temp[e.over!.id].push(e.active.id.toString())
-        return temp
-      }
-      if (initialContainer === targetContainer) {
-        const oldIdx = temp[initialContainer].indexOf(e.active.id.toString())
-        const newIdx = temp[initialContainer].indexOf(e.over!.id.toString())
-        temp[initialContainer] = arrayMove(
-          temp[initialContainer],
-          oldIdx,
-          newIdx,
-        )
-      } else {
-        temp[initialContainer] = temp[initialContainer].filter(
-          task => task !== e.active.id.toString(),
-        )
-        const newIdx = temp[targetContainer].indexOf(e.over!.id.toString())
-        temp[targetContainer].splice(newIdx, 0, e.active.id.toString())
-      }
-      return temp
-    })
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    const activeId = String(active.id)
+    const overId = over ? String(over.id) : null
+    const activeColumn = findColumn(activeId)
+    const overColumn = findColumn(overId)
+    if (!activeColumn || !overColumn || activeColumn !== overColumn) {
+      return null
+    }
+    const activeIndex = activeColumn.cards.findIndex(i => i.id === activeId)
+    const overIndex = overColumn.cards.findIndex(i => i.id === overId)
+    if (activeIndex !== overIndex) {
+      setColumns(prevState => {
+        return prevState.map(column => {
+          if (column.id === activeColumn.id) {
+            column.cards = arrayMove(overColumn.cards, activeIndex, overIndex)
+            return column
+          } else {
+            return column
+          }
+        })
+      })
+    }
+    // dispatch(updateLists(columns))
   }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  )
   return (
-    <DndContext onDragEnd={dragEndHandler} onDragOver={dragOverHandler}>
-      <main>
-        <h1>Multi sortable List</h1>
-        <section className='container'>
-          {Object.keys(taskList).map(key => (
-            <TaskList key={key} name={key} id={key} tasks={taskList[key]} />
-          ))}
-        </section>
-      </main>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+    >
+      <div
+        className='App'
+        style={{ display: 'flex', flexDirection: 'row', padding: '20px' }}
+      >
+        {columns.map(column => (
+          <Column
+            key={column.id}
+            id={column.id}
+            name={column.name}
+            cards={column.cards}
+          ></Column>
+        ))}
+      </div>
     </DndContext>
   )
 }

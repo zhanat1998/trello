@@ -18,10 +18,9 @@ const MainPage: React.FC = () => {
   const [textArea, setTextArea] = useState('')
   const [editMode, setEditMode] = useState(false)
   const [newImageUrl, setNewImageUrl] = useState<string | null>(null)
-  const cards = useAppSelector(state => state.shopReducer.TODOS)
-  const Listss = useAppSelector(state => state.shopReducer.lists)
-  console.log(Listss, 'Listsssssssssssss')
-  // console.log(cards, 'cards')
+  // const cards = useAppSelector(state => state.shopReducer.TODOS)
+  const Lists = useAppSelector(state => state.shopReducer.lists)
+  console.log(Lists, 'Listsssssssssssss')
   const dispatch = useAppDispatch()
 
   const showModal = (
@@ -115,14 +114,14 @@ const MainPage: React.FC = () => {
   }
   return (
     <div className='main'>
-      {Listss.map(list => (
+      {Lists.map(list => (
         <Card
           key={list.id}
           title={list.name}
           bordered={false}
           style={{ width: 300, marginRight: '20px' }}
         >
-          {list.todos.map(todo => (
+          {list.cards.map(todo => (
             <div
               draggable={true}
               key={todo.id}

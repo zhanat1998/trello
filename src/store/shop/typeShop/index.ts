@@ -7,7 +7,7 @@ export type Todo = {
 export type List = {
   id: string
   name: string
-  todos: Todo[]
+  cards: Todo[]
 }
 export type InitialStateType = {
   TODOS: Todo[]
@@ -21,17 +21,56 @@ const mockList: List[] = [
   {
     id: '1',
     name: 'List 1',
-    todos: [],
+    cards: [
+      {
+        id: 'a',
+        title: 'Card1',
+        description: '',
+        image: '',
+      },
+      {
+        id: 'b',
+        title: 'Card2',
+        description: '',
+        image: '',
+      },
+    ],
   },
   {
     id: '2',
     name: 'List 2',
-    todos: [],
+    cards: [
+      {
+        id: 'c',
+        title: 'Card3',
+        description: '',
+        image: '',
+      },
+      {
+        id: 'd',
+        title: 'Card4',
+        description: '',
+        image: '',
+      },
+    ],
   },
   {
     id: '3',
     name: 'List 3',
-    todos: [],
+    cards: [
+      {
+        id: 'e',
+        title: 'Card5',
+        description: '',
+        image: '',
+      },
+      {
+        id: 'f',
+        title: 'Card6',
+        description: '',
+        image: '',
+      },
+    ],
   },
 ]
 
@@ -45,6 +84,5 @@ export const initialState: InitialStateType = {
     description: '',
     image: null,
   },
-  // TODO: use singular form of list
   lists: mockList,
 }
