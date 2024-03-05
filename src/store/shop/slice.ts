@@ -1,17 +1,35 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { initialState } from './typeShop'
 import { PayloadAction } from '@reduxjs/toolkit'
+import { Todo } from './typeShop'
 export const shopSlice = createSlice({
   name: 'shop',
   initialState,
   reducers: {
-    addTodo: (state, action) => {
-      state.TODOS.push(action.payload)
+    addTodoToList: (
+      state,
+      action: PayloadAction<{ listId: string; todo: Todo }>,
+    ) => {
+      const { listId, todo } = action.payload
+      const listIndex = state.lists.findIndex(list => list.id === listId)
+      if (listIndex !== -1) {
+        state.lists[listIndex].todos.push(todo)
+      }
     },
+    // addTodoToList: (
+    //   state,
+    //   action: PayloadAction<{ listId: string; todo: Todo }>,
+    // ) => {
+    //   const { listId, todo } = action.payload
+    //   const listIndex = state.lists.findIndex(list => list.id === listId)
+    //   if (listIndex !== -1) {
+    //     state.lists[listIndex].todos = [...state.lists[listIndex].todos, todo] // Updating todos immutably
+    //   }
+    // },
     editTodo(
       state,
       action: PayloadAction<{
-        id: number
+        id: string
       }>,
     ) {
       const { id } = action.payload
@@ -19,7 +37,7 @@ export const shopSlice = createSlice({
       if (todoIndex !== -1) {
       }
     },
-    editTitle(state, action: PayloadAction<{ id: number; title: string }>) {
+    editTitle(state, action: PayloadAction<{ id: string; title: string }>) {
       const { id, title } = action.payload
       const todoIndex = state.TODOS.findIndex(todo => todo.id === id)
       if (todoIndex !== -1) {
@@ -28,7 +46,7 @@ export const shopSlice = createSlice({
     },
     editDescription(
       state,
-      action: PayloadAction<{ id: number; description: string }>,
+      action: PayloadAction<{ id: string; description: string }>,
     ) {
       const { id, description } = action.payload
       const todoIndex = state.TODOS.findIndex(todo => todo.id === id)
@@ -38,7 +56,7 @@ export const shopSlice = createSlice({
     },
     editImage(
       state,
-      action: PayloadAction<{ id: number; image: string | null }>,
+      action: PayloadAction<{ id: string; image: string | null }>,
     ) {
       const { id, image } = action.payload
       const todoIndex = state.TODOS.findIndex(todo => todo.id === id)
@@ -48,7 +66,7 @@ export const shopSlice = createSlice({
     },
     deleteImage(
       state,
-      action: PayloadAction<{ id: number | null; image: null }>,
+      action: PayloadAction<{ id: string | null; image: null }>,
     ) {
       const { id, image } = action.payload
       const todoIndex = state.TODOS.findIndex(todo => todo.id === id)
@@ -60,7 +78,7 @@ export const shopSlice = createSlice({
 })
 
 export const {
-  addTodo,
+  addTodoToList,
   editTitle,
   editDescription,
   editImage,

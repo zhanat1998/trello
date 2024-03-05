@@ -16,6 +16,7 @@ import { shopSlice } from './shop/slice'
 const persistConfig = {
   key: 'root',
   storage,
+  // whitelist: ['navigation'],
 }
 const rootReducer = combineReducers({
   shopReducer: shopSlice.reducer,
