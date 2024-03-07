@@ -1,5 +1,4 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit'
-
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import {
   persistReducer,
   FLUSH,
@@ -11,16 +10,21 @@ import {
   persistStore,
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-import { shopSlice } from './shop/slice'
+import { doneSlice } from '../slice/done';
+import { inProgressSlice } from '../slice/inProgress';
+import { todoSlice } from '../slice/todo';
+import { discussionSlice } from '../slice/discussion';
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['shopReducer'],
-}
+  whitelist: ['done', 'inProgress', 'todo', 'discussion'],
+};
 const rootReducer = combineReducers({
-  shopReducer: shopSlice.reducer,
-})
+    done: doneSlice.reducer,
+    inProgress: inProgressSlice.reducer,
+    todo: todoSlice.reducer,
+    discussion: discussionSlice.reducer})
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 export const store = configureStore({
@@ -33,5 +37,5 @@ export const store = configureStore({
     }),
 })
 export const persistor = persistStore(store)
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export type StoreDispatch = typeof store.dispatch;
+export type StoreState = ReturnType<typeof store.getState>;
