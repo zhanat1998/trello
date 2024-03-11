@@ -1,25 +1,29 @@
-import Typography from '@mui/material/Typography';
-import { useSelector } from 'react-redux';
-import { StoreState } from '../../redux/store';
-import ColumnLayout from '../ColumnLayout';
-import { discussionSlice } from '../../redux/slice/discussion';
+import Typography from '@mui/material/Typography'
+import { useSelector } from 'react-redux'
+import { StoreState } from '../../redux/store'
+import { ColumnContainer } from '../../container/ColumnLayoutContainer'
+import { discussionSlice } from '../../redux/slice/discussion'
 
 export function DiscussionColumn() {
-  const { discussion } = useSelector((state: StoreState) => state);
+  const { discussion } = useSelector((state: StoreState) => state)
   const {
-    actions: { remove, add },
-  } = discussionSlice;
+    actions: { remove, add, editText, editDescription, editImage, deleteImage },
+  } = discussionSlice
 
   return (
     <>
-      <Typography mb={3}>All discussion tasks: {discussion.length}</Typography>
-      <ColumnLayout
+      <Typography mb={3}>discussion</Typography>
+      <ColumnContainer
         droppableId='discussion'
-        labelText="add card"
+        labelText='+ Add a card'
         removeHandler={remove}
         addHandler={add}
         selectorState={discussion}
+        editTextHandler={editText}
+        editAreaHandler={editDescription}
+        editImageHandler={editImage}
+        deleteImageHandler={deleteImage}
       />
     </>
-  );
+  )
 }

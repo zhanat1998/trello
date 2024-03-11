@@ -1,16 +1,13 @@
-import { AnyAction } from '@reduxjs/toolkit';
+import { AnyAction } from '@reduxjs/toolkit'
+import { StoreDispatch } from '../redux/store'
+
+export type ImageType = string | File | null
 
 export interface IModel {
-  id: string;
-  text: string;
-  isFinished: boolean;
-  isTextShowed?: boolean;
+  id: string
+  text: string
+  image: ImageType
+  description: string
+  isFinished?: boolean
 }
 
-export interface IColumnLayoutProps {
-  labelText?: string;
-  addHandler: (v: string) => AnyAction;
-  removeHandler: (v: string) => AnyAction;
-  selectorState: IModel[];
-  droppableId: string;
-}

@@ -1,193 +1,112 @@
-import React, { useState } from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Alert from '@mui/material/Alert';
-import Collapse from '@mui/material/Collapse';
-import { useDispatch } from 'react-redux';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
-import { StoreDispatch } from '../redux/store';
-import { IColumnLayoutProps } from '../types';
+import React, { useState } from 'react'
+import Button from '@mui/material/Button'
+import Box from '@mui/material/Box'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
+import IconButton from '@mui/material/IconButton'
+import DeleteIcon from '@mui/icons-material/Delete'
+import { Droppable, Draggable } from 'react-beautiful-dnd'
+import { Input } from 'antd'
+import '../../src/components/ColumnLayout.scss'
+import { CustomModal } from './modal/CustomModal'
+import { IColumnLayoutProps } from './types'
 
-const ColumnLayout: React.FC<IColumnLayoutProps> = ({
-  labelText,
-  addHandler,
-  removeHandler,
+export const ColumnLayout: React.FC<IColumnLayoutProps> = ({
   selectorState,
   droppableId,
+  isModalOpen,
+  handleCancelModal,
+  isAddingCard,
+  handleAddCard,
+  handleOpenModal,
+  handleCancel,
+  handleEditModalText,
+  handleEditModalDescription,
+  handleEditImage,
+  handleDeleteImage,
+  removeHandler,
+  handleSubmitCard,
+  selectedItem,
+  setNewCardTitle,
+  dispatch,
 }) => {
-  const [isError, setIsError] = useState({
-    isShow: false,
-    text: '',
-  });
-
-  const [textDescription, setTextDescription] = useState('');
-  const dispatch = useDispatch<StoreDispatch>();
-
-  const handleOnChange = ({
-    target: { value },
-  }: React.ChangeEvent<HTMLInputElement>) => {
-    setTextDescription(value);
-
-    setIsError({
-      isShow: value.length > 200,
-      text:
-        value.length > 200
-          ? 'The input value cannot be more than 200 characters'
-          : '',
-    });
-  };
-
-  const handleOnBlur = () => {
-    setIsError({ ...isError, isShow: false });
-  };
-
-  const handleOnClick = () => {
-    if (!isError.isShow) {
-      dispatch(addHandler(textDescription));
-      setTextDescription('');
-    }
-  };
-
-  const handleInputKeyDown = ({
-    target,
-    key,
-  }: React.KeyboardEvent<HTMLInputElement>) => {
-    if (key === 'Enter') {
-      if (
-        (target as HTMLInputElement).value.length > 0 &&
-        (target as HTMLInputElement).value.length <= 200
-      ) {
-        handleOnClick();
-      } else {
-        setIsError({
-          isShow: true,
-          text: 'The input value cannot be empty',
-        });
-      }
-    }
-  };
-
   return (
-    <Box borderRadius={1} width='100%' sx={{ boxShadow: 2, p: 3 }}>
-      <TextField
-        fullWidth
-        label={labelText}
-        onChange={handleOnChange}
-        onBlur={handleOnBlur}
-        onKeyDown={handleInputKeyDown}
-        value={textDescription}
-        variant='outlined'
-        size='small'
-      />
+    <>
+      <Box className='custom-box'>
+        <Droppable droppableId={droppableId}>
+          {provided => (
+            <List
+              className='list'
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+            >
+              {selectorState.map(
+                ({ id, text, description, image }, index: number) => (
+                  <Draggable key={id} draggableId={id} index={index}>
+                    {(provided, snapshot) => (
+                      <>
+                        <ListItem
+                          onClick={() =>
+                            handleOpenModal(id, text, description, image)
+                          }
+                          className={`list-item ${
+                            snapshot.isDragging ? 'dragging' : ''
+                          }`}
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <ListItemText className='list-item-text'>
+                            <Box component='span' className='text'>
+                              {text}
+                            </Box>
+                            <Box component='span' className='icon-button'>
+                              <IconButton
+                                onClick={() => dispatch(removeHandler(id))}
+                              >
+                                <DeleteIcon className='delete-icon' />
+                              </IconButton>
+                            </Box>
+                          </ListItemText>
+                        </ListItem>
 
-      <Collapse in={isError.isShow}>
-        <Alert severity='error' sx={{ my: 1 }}>
-          {isError.text}
-        </Alert>
-      </Collapse>
-
-      <Box width='100%' display='flex' justifyContent='center'>
-        <Button
-          size='medium'
-          sx={{ my: 1, maxWidth: 200 }}
-          variant='outlined'
-          color='primary'
-          fullWidth
-          onClick={handleOnClick}
-          onKeyDown={({ key }) => key === 'Enter' && handleOnClick()}
-          disabled={
-            textDescription.length === 0 || textDescription.length > 200
-          }
-        >
-          Add Item
-        </Button>
+                        <CustomModal
+                          isModalOpen={isModalOpen}
+                          handleCancelModal={handleCancelModal}
+                          selectedItem={selectedItem}
+                          handleEditModalText={handleEditModalText}
+                          handleEditModalDescription={
+                            handleEditModalDescription
+                          }
+                          handleDeleteImage={handleDeleteImage}
+                          handleEditImage={handleEditImage}
+                        />
+                      </>
+                    )}
+                  </Draggable>
+                ),
+              )}
+              {provided.placeholder}
+            </List>
+          )}
+        </Droppable>
       </Box>
-      <Droppable droppableId={droppableId}>
-        {(provided) => (
-          <List
-            sx={{
-              minHeight: '300px',
-              li: {
-                flexDirection: 'column',
-              },
-              '& .MuiListItemText-root': {
-                width: '100%',
-              },
-            }}
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-          >
-            {selectorState.map(
-              (
-                { id, text, isFinished, isTextShowed },
-                index: number
-              ) => (
-                <Draggable key={id} draggableId={id} index={index}>
-                  {(provided, snapshot) => (
-                    <ListItem
-                      sx={{
-                        transition: '.3s ease background-color',
-                        color: snapshot.isDragging ? '#fff' : '#000',
-                        bgcolor: snapshot.isDragging ? '#000' : '#fff',
-                        position: 'relative',
-                        border: '1px solid #989898',
-                        my: 1,
-                        borderRadius: '3px',
-                        '& .MuiTypography-root': {
-                          display: 'flex',
-                          alignItems: 'center',
-                        },
-                      }}
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      <ListItemText
-                        sx={{
-                          textDecoration: isFinished ? 'line-through' : 'none',
-                          wordBreak: 'break-word',
-                        }}
-                      >
-                        <Box component='span' width='100%'>
-                          {text}
-                        </Box>
-
-                        <Box display='flex' component='span'>
-                          <IconButton
-                            onClick={() => dispatch(removeHandler(id))}
-                          >
-                            <DeleteIcon
-                              sx={{
-                                color: snapshot.isDragging ? '#fff' : '#000',
-                              }}
-                            />
-                          </IconButton>
-                         
-                        </Box>
-                      </ListItemText>
-                      <Collapse in={isTextShowed}>
-                        You can add here some content{' '}
-                        <span role='img' aria-label='emoji'>
-                          😍
-                        </span>
-                      </Collapse>
-                    </ListItem>
-                  )}
-                </Draggable>
-              )
-            )}
-            {provided.placeholder}
-          </List>
-        )}
-      </Droppable>
-    </Box>
-  );
-};
-
-export default ColumnLayout;
+      {isAddingCard ? (
+        <div style={{ padding: '8px' }}>
+          <Input
+            placeholder='Enter a title for this card...'
+            onChange={e => setNewCardTitle(e.target.value)}
+            onPressEnter={handleAddCard}
+          />
+          <Button onClick={handleSubmitCard}>Add card</Button>
+          <Button onClick={handleCancel}>x</Button>
+        </div>
+      ) : (
+        <div className='main__addCard' onClick={handleAddCard}>
+          + Add a card
+        </div>
+      )}
+    </>
+  )
+}

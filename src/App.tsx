@@ -55,7 +55,7 @@ function App() {
     <Container>
       <Typography textAlign='center' variant='h3' mt={3} mb={5}>
         My Trello board
-      </Typography>{' '}
+      </Typography>
       <Grid container spacing={3} justifyContent='center'>
         <DragDropContext onDragEnd={res => onDragEnd(res)}>
           <Grid item md={3}>

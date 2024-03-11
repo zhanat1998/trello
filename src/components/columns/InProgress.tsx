@@ -1,26 +1,30 @@
-import Typography from '@mui/material/Typography';
-import { useSelector } from 'react-redux';
-import { StoreState } from '../../redux/store';
-import { inProgressSlice } from '../../redux/slice/inProgress';
-import ColumnLayout from '../ColumnLayout';
+import Typography from '@mui/material/Typography'
+import { useSelector } from 'react-redux'
+import { StoreState } from '../../redux/store'
+import { inProgressSlice } from '../../redux/slice/inProgress'
+import { ColumnContainer } from '../../container/ColumnLayoutContainer'
 
 export function InProgressColumn() {
-  const { inProgress } = useSelector((state: StoreState) => state);
+  const { inProgress } = useSelector((state: StoreState) => state)
 
   const {
-    actions: {  remove, add },
-  } = inProgressSlice;
+    actions: { remove, add, editText, editDescription, editImage, deleteImage },
+  } = inProgressSlice
 
   return (
     <>
-      <Typography mb={3}>All inProgress tasks: {inProgress.length}</Typography>
-      <ColumnLayout
+      <Typography mb={3}>inProgress</Typography>
+      <ColumnContainer
         droppableId='inProgress'
-        labelText="add card"
+        labelText='+ Add a card'
         removeHandler={remove}
         addHandler={add}
         selectorState={inProgress}
+        editTextHandler={editText}
+        editAreaHandler={editDescription}
+        editImageHandler={editImage}
+        deleteImageHandler={deleteImage}
       />
     </>
-  );
+  )
 }
