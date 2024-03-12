@@ -11,7 +11,7 @@ export interface ColumnContainerTypes {
   editAreaHandler: (payload: { id: string; newTextArea: string }) => AnyAction
   editImageHandler: (payload: {
     id: string
-    newImage: string | null
+    newImage: string | null | undefined
   }) => AnyAction
   deleteImageHandler: (payload: { id: string; newImage: null }) => AnyAction
 }

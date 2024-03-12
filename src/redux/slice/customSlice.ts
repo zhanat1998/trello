@@ -65,17 +65,12 @@ export const createCustomSlice = (name: string) => {
         action: PayloadAction<{ id: string; newImage: ImageType }>,
       ) => {
         const { id, newImage } = action.payload
-        const modelIndex = state.findIndex(model => model.id === id)
-        if (modelIndex !== -1) {
-          return state.map((model, index) => {
-            if (index === modelIndex) {
-              return { ...model, image: newImage }
-            }
-            return model
-          })
+        const model = state.find(model => model.id === id)
+        if (model) {
+          model.image = newImage
         }
-        return state
       },
+
       deleteImage: (
         state,
         action: PayloadAction<{ id: string; newImage: null }>,

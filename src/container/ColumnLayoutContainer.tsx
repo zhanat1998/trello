@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ImageType } from '../types'
+import { IModel, ImageType } from '../types'
 import { useDispatch } from 'react-redux'
 import { StoreDispatch } from '../redux/store'
 import { ColumnLayout } from '../components/ColumnLayout'
@@ -24,6 +24,9 @@ export const ColumnContainer: React.FC<ColumnContainerTypes> = ({
     description: string
     image: ImageType
   } | null>(null)
+  const [selectedImage, setSelectedImage] = useState<string | undefined | null>(
+    null,
+  )
 
   const handleSubmitCard = () => {
     if (newCardTitle.trim() !== '' && newCardTitle.length <= 200) {
@@ -58,12 +61,7 @@ export const ColumnContainer: React.FC<ColumnContainerTypes> = ({
     if (selectedItem) {
       dispatch(editTextHandler({ id: selectedItem.id, newText }))
       setSelectedItem(prevState => ({
-        ...(prevState as {
-          id: string
-          text: string
-          description: string
-          image: string | null
-        }),
+        ...(prevState as IModel),
         text: newText,
       }))
     }
@@ -72,34 +70,20 @@ export const ColumnContainer: React.FC<ColumnContainerTypes> = ({
     if (selectedItem) {
       dispatch(editAreaHandler({ id: selectedItem.id, newTextArea }))
       setSelectedItem(prevState => ({
-        ...(prevState as {
-          id: string
-          text: string
-          description: string
-          image: ImageType
-        }),
+        ...(prevState as IModel),
         description: newTextArea,
       }))
     }
   }
-  const handleEditImage = (newImage: ImageType) => {
-    if (selectedItem) {
-      let imageUrl: string | null = null
 
-      if (typeof newImage === 'string') {
-        imageUrl = newImage
-      } else if (newImage instanceof File) {
-        imageUrl = URL.createObjectURL(newImage)
-      }
-      dispatch(editImageHandler({ id: selectedItem.id, newImage: imageUrl }))
+  const handleEditImage = (newImage: string | null | undefined) => {
+    setSelectedImage(newImage)
+
+    if (selectedItem) {
+      dispatch(editImageHandler({ id: selectedItem.id, newImage }))
       setSelectedItem(prevState => ({
-        ...(prevState as {
-          id: string
-          text: string
-          description: string
-          image: string | null
-        }),
-        image: imageUrl,
+        ...(prevState as IModel),
+        image: newImage,
       }))
     }
   }
@@ -107,15 +91,17 @@ export const ColumnContainer: React.FC<ColumnContainerTypes> = ({
     if (selectedItem) {
       dispatch(deleteImageHandler({ id: selectedItem.id, newImage: null }))
       setSelectedItem(prevState => ({
-        ...(prevState as {
-          id: string
-          text: string
-          description: string
-          image: File | null
-        }),
+        ...(prevState as IModel),
         image: null,
       }))
     }
+  }
+  const handleDeleteItem = (
+    id: string,
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.stopPropagation()
+    dispatch(removeHandler(id))
   }
   const dispatch = useDispatch<StoreDispatch>()
 
@@ -143,6 +129,8 @@ export const ColumnContainer: React.FC<ColumnContainerTypes> = ({
       editImageHandler={editImageHandler}
       deleteImageHandler={deleteImageHandler}
       dispatch={dispatch}
+      handleDeleteItem={handleDeleteItem}
+      selectedImage={selectedImage}
     />
   )
 }

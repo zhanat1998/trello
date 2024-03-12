@@ -14,10 +14,9 @@ export const CustomModal: React.FC<ModalType> = ({
 }) => {
   return (
     <Modal open={isModalOpen} onCancel={handleCancelModal}>
-      <div>
+      <div className='modal'>
         {selectedItem && (
           <>
-            <p>ID: {selectedItem.id}</p>
             <p>
               Text:{' '}
               <input
@@ -25,19 +24,14 @@ export const CustomModal: React.FC<ModalType> = ({
                 value={selectedItem.text}
                 onChange={e => handleEditModalText(e.target.value)}
               />
-              {!selectedItem.text && (
-                <label className='label-text'>Give text name</label>
-              )}
             </p>
             <p>
               Description:{' '}
               <textarea
+                className='textarea'
                 value={selectedItem.description}
                 onChange={e => handleEditModalDescription(e.target.value)}
               />
-              {!selectedItem.description && (
-                <label className='label-description'>Give description</label>
-              )}
             </p>
             <div>
               <div className='image-container'>
@@ -49,24 +43,38 @@ export const CustomModal: React.FC<ModalType> = ({
                         ? selectedItem.image
                         : undefined
                     }
-                    alt='Selected'
                   />
                 </p>
-                <button onClick={handleDeleteImage} className='delete-button'>
-                  Delete Image
-                </button>
               </div>
-              <input
+              {/* <input
                 className='image-input'
                 type='file'
                 accept='image/*'
                 id='fileInput'
                 onChange={e => handleEditImage(e.target.files?.[0] ?? null)}
+              /> */}
+              <input
+                className='image-input'
+                type='file'
+                accept='image/*'
+                id='fileInput'
+                onChange={e => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    const imageUrl = URL.createObjectURL(file)
+                    handleEditImage(imageUrl)
+                  } else {
+                    handleEditImage(null)
+                  }
+                }}
               />
             </div>
             <label className='download-icon' htmlFor='fileInput'>
-              <DownloadForOfflineIcon />
+              <img src='https://cdn-icons-png.flaticon.com/512/1092/1092004.png' />
             </label>
+            <button onClick={handleDeleteImage} className='delete-button'>
+              Delete Image
+            </button>
           </>
         )}
       </div>

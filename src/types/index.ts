@@ -1,7 +1,7 @@
 import { AnyAction } from '@reduxjs/toolkit'
 import { StoreDispatch } from '../redux/store'
 
-export type ImageType = string | File | null
+export type ImageType = string | null | undefined
 
 export interface IModel {
   id: string
@@ -10,4 +10,3 @@ export interface IModel {
   description: string
   isFinished?: boolean
 }
-

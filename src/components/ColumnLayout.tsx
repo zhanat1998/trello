@@ -25,11 +25,11 @@ export const ColumnLayout: React.FC<IColumnLayoutProps> = ({
   handleEditModalDescription,
   handleEditImage,
   handleDeleteImage,
-  removeHandler,
   handleSubmitCard,
   selectedItem,
   setNewCardTitle,
-  dispatch,
+  handleDeleteItem,
+  selectedImage,
 }) => {
   return (
     <>
@@ -46,6 +46,11 @@ export const ColumnLayout: React.FC<IColumnLayoutProps> = ({
                   <Draggable key={id} draggableId={id} index={index}>
                     {(provided, snapshot) => (
                       <>
+                        {/* {selectedImage && (
+                          <div className='selected-image-border'>
+                            <img src={selectedImage} />
+                          </div>
+                        )} */}
                         <ListItem
                           onClick={() =>
                             handleOpenModal(id, text, description, image)
@@ -63,7 +68,7 @@ export const ColumnLayout: React.FC<IColumnLayoutProps> = ({
                             </Box>
                             <Box component='span' className='icon-button'>
                               <IconButton
-                                onClick={() => dispatch(removeHandler(id))}
+                                onClick={event => handleDeleteItem(id, event)}
                               >
                                 <DeleteIcon className='delete-icon' />
                               </IconButton>

@@ -1,6 +1,6 @@
-import { AnyAction } from "@reduxjs/toolkit"
-import { IModel, ImageType } from "../types"
-import { StoreDispatch } from "../redux/store"
+import { AnyAction } from '@reduxjs/toolkit'
+import { IModel, ImageType } from '../types'
+import { StoreDispatch } from '../redux/store'
 
 export interface IColumnLayoutProps {
   addHandler: (v: string) => AnyAction
@@ -33,4 +33,9 @@ export interface IColumnLayoutProps {
   selectedItem: IModel | null
   setNewCardTitle: (newValue: string) => void
   dispatch: StoreDispatch
+  handleDeleteItem: (
+    id: string,
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => void
+  selectedImage: undefined | null | string
 }
