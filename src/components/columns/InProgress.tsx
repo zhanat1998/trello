@@ -7,6 +7,8 @@ import { ColumnContainer } from '../../container/ColumnLayoutContainer'
 export function InProgressColumn() {
   const { inProgress } = useSelector((state: StoreState) => state)
 
+  console.log('inProgress: ', inProgress)
+
   const {
     actions: { remove, add, editText, editDescription, editImage, deleteImage },
   } = inProgressSlice

@@ -8,4 +8,9 @@ export interface ModalType {
   handleEditModalDescription: (newTextArea: string) => void
   handleEditImage: (newImage: ImageType) => void
   handleDeleteImage: () => void
+  handleShowMembersTable: () => void
+  showMembersTable: boolean
+  selectedMembers: string[]
+  handleCloseMembersTable: () => void
+  handleMemberSelection: (memberName: string) => void
 }

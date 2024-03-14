@@ -13,6 +13,7 @@ import { inProgressSlice as inProgress } from './redux/slice/inProgress'
 import { doneSlice as done } from './redux/slice/done'
 import { StoreState } from './redux/store'
 import { IModel } from './types'
+import { useState } from 'react'
 
 type TAllSilces = 'todo' | 'inProgress' | 'done' | 'discussion'
 

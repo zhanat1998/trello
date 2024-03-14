@@ -38,4 +38,9 @@ export interface IColumnLayoutProps {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => void
   selectedImage: undefined | null | string
+  handleShowMembersTable: () => void
+  showMembersTable: boolean
+  selectedMembers: string[]
+  handleCloseMembersTable: () => void
+  handleMemberSelection: (memberName: string) => void
 }

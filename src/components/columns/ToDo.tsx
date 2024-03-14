@@ -6,6 +6,7 @@ import { ColumnContainer } from '../../container/ColumnLayoutContainer'
 
 export function ToDoColumn() {
   const { todo } = useSelector((state: StoreState) => state)
+  console.log('todo: ', todo)
   const {
     actions: { remove, add, editText, editDescription, editImage, deleteImage },
   } = todoSlice

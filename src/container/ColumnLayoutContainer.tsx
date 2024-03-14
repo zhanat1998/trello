@@ -1,9 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { IModel, ImageType } from '../types'
 import { useDispatch } from 'react-redux'
 import { StoreDispatch } from '../redux/store'
 import { ColumnLayout } from '../components/ColumnLayout'
-import { ColumnContainerTypes } from './types'
+import { ColumnContainerTypes, TItem } from './types'
+
+export const existingMembers = [
+  { id: 1, name: 'zhanat', picture: '' },
+  { id: 2, name: 'alllo', picture: '' },
+  { id: 3, name: 'hdbvhe', picture: '' },
+]
+let _selectedItem: TItem | null = null
 
 export const ColumnContainer: React.FC<ColumnContainerTypes> = ({
   addHandler,
@@ -18,15 +25,28 @@ export const ColumnContainer: React.FC<ColumnContainerTypes> = ({
   const [newCardTitle, setNewCardTitle] = useState<string>('')
   const [isAddingCard, setIsAddingCard] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<{
-    id: string
-    text: string
-    description: string
-    image: ImageType
-  } | null>(null)
+  const [selectedItem, setSelectedItem] = useState<TItem | null>(null)
   const [selectedImage, setSelectedImage] = useState<string | undefined | null>(
     null,
   )
+  const [showMembersTable, setShowMembersTable] = useState(false)
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([])
+
+  const handleShowMembersTable = () => {
+    setShowMembersTable(true)
+  }
+
+  const handleCloseMembersTable = () => {
+    setShowMembersTable(false)
+  }
+
+  const handleMemberSelection = (memberName: string) => {
+    if (selectedMembers.includes(memberName)) {
+      setSelectedMembers(selectedMembers.filter(name => name !== memberName))
+    } else {
+      setSelectedMembers([...selectedMembers, memberName])
+    }
+  }
 
   const handleSubmitCard = () => {
     if (newCardTitle.trim() !== '' && newCardTitle.length <= 200) {
@@ -50,9 +70,16 @@ export const ColumnContainer: React.FC<ColumnContainerTypes> = ({
     description: string,
     image: ImageType,
   ) => {
-    setSelectedItem({ id, text, description, image })
+    const item = { id, text, description, image }
+    setSelectedItem(item)
     setIsModalOpen(true)
+    console.log('item: ', item)
+    _selectedItem = item
   }
+
+  useEffect(() => {
+    console.log('changedItem: ', selectedItem)
+  }, [selectedItem])
 
   const handleCancelModal = () => {
     setIsModalOpen(false)
@@ -78,15 +105,15 @@ export const ColumnContainer: React.FC<ColumnContainerTypes> = ({
 
   const handleEditImage = (newImage: string | null | undefined) => {
     setSelectedImage(newImage)
-
-    if (selectedItem) {
-      dispatch(editImageHandler({ id: selectedItem.id, newImage }))
-      setSelectedItem(prevState => ({
-        ...(prevState as IModel),
+    if (_selectedItem) {
+      dispatch(editImageHandler({ id: _selectedItem.id, newImage }))
+      setSelectedItem({
+        ..._selectedItem,
         image: newImage,
-      }))
+      })
     }
   }
+
   const handleDeleteImage = () => {
     if (selectedItem) {
       dispatch(deleteImageHandler({ id: selectedItem.id, newImage: null }))
@@ -131,6 +158,11 @@ export const ColumnContainer: React.FC<ColumnContainerTypes> = ({
       dispatch={dispatch}
       handleDeleteItem={handleDeleteItem}
       selectedImage={selectedImage}
+      handleShowMembersTable={handleShowMembersTable}
+      showMembersTable={showMembersTable}
+      selectedMembers={selectedMembers}
+      handleCloseMembersTable={handleCloseMembersTable}
+      handleMemberSelection={handleMemberSelection}
     />
   )
 }

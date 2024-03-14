@@ -7,7 +7,7 @@ import ListItemText from '@mui/material/ListItemText'
 import IconButton from '@mui/material/IconButton'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { Input } from 'antd'
+import { Avatar, Input } from 'antd'
 import '../../src/components/ColumnLayout.scss'
 import { CustomModal } from './modal/CustomModal'
 import { IColumnLayoutProps } from './types'
@@ -29,7 +29,11 @@ export const ColumnLayout: React.FC<IColumnLayoutProps> = ({
   selectedItem,
   setNewCardTitle,
   handleDeleteItem,
-  selectedImage,
+  handleShowMembersTable,
+  showMembersTable,
+  selectedMembers,
+  handleCloseMembersTable,
+  handleMemberSelection,
 }) => {
   return (
     <>
@@ -46,11 +50,6 @@ export const ColumnLayout: React.FC<IColumnLayoutProps> = ({
                   <Draggable key={id} draggableId={id} index={index}>
                     {(provided, snapshot) => (
                       <>
-                        {/* {selectedImage && (
-                          <div className='selected-image-border'>
-                            <img src={selectedImage} />
-                          </div>
-                        )} */}
                         <ListItem
                           onClick={() =>
                             handleOpenModal(id, text, description, image)
@@ -73,6 +72,20 @@ export const ColumnLayout: React.FC<IColumnLayoutProps> = ({
                                 <DeleteIcon className='delete-icon' />
                               </IconButton>
                             </Box>
+                            {selectedItem &&
+                              selectedItem.id === id &&
+                              selectedMembers.map((name, index) => (
+                                <Avatar
+                                  key={index}
+                                  style={{
+                                    verticalAlign: 'middle',
+                                    marginRight: '5px',
+                                  }}
+                                  size='small'
+                                >
+                                  {name[0].toUpperCase()}
+                                </Avatar>
+                              ))}
                           </ListItemText>
                         </ListItem>
 
@@ -86,6 +99,11 @@ export const ColumnLayout: React.FC<IColumnLayoutProps> = ({
                           }
                           handleDeleteImage={handleDeleteImage}
                           handleEditImage={handleEditImage}
+                          handleShowMembersTable={handleShowMembersTable}
+                          showMembersTable={showMembersTable}
+                          selectedMembers={selectedMembers}
+                          handleCloseMembersTable={handleCloseMembersTable}
+                          handleMemberSelection={handleMemberSelection}
                         />
                       </>
                     )}

@@ -1,8 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction, current } from '@reduxjs/toolkit'
 import { v4 as uuidv4 } from 'uuid'
 import { ImageType, IModel } from '../../types'
-
-const initialState: IModel[] = []
+import { initialState } from '../../types'
 
 export const createCustomSlice = (name: string) => {
   const {
@@ -49,6 +48,7 @@ export const createCustomSlice = (name: string) => {
         if (model) {
           model.text = newText
         }
+        console.log(current(state), 'state')
       },
       editDescription: (
         state,
